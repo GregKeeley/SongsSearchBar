@@ -8,6 +8,11 @@
 
 import UIKit
 
+enum SearchScope {
+    case name
+    case artist
+}
+
 class ViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
@@ -18,7 +23,17 @@ class ViewController: UIViewController {
             tableView.reloadData()
         }
     }
-    var searchQuery = ""
+    var currentScope = SearchScope.name
+    var searchQuery = "" {
+        didSet {
+            switch currentScope {
+            case .name:
+                loveSongs = loveSongs.filter { $0.name.lowercased().contains(searchQuery.lowercased())}
+            case .artist:
+                loveSongs = loveSongs.filter { $0.artist.lowercased().contains(searchQuery.lowercased()) }
+                }
+            }
+        }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -73,5 +88,15 @@ extension ViewController: UISearchBarDelegate {
             return
         }
         searchQuery = searchText
+    }
+    func searchBar(_ searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
+        switch selectedScope {
+        case 0:
+            currentScope = .name
+        case 1:
+            currentScope = .artist
+        default:
+            searchBar.placeholder = "not a valid search scope"
+        }
     }
 }
