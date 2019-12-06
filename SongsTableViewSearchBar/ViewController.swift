@@ -17,7 +17,8 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var searchBar: UISearchBar!
- 
+    @IBOutlet weak var noResultLabel: UILabel!
+    
     var loveSongs = [Song]() {
         didSet {
             tableView.reloadData()
@@ -40,10 +41,19 @@ class ViewController: UIViewController {
         tableView.dataSource = self
         searchBar.delegate = self
         updateUI()
+        noResultLabel.isHidden = true
     }
 
     func updateUI() {
         loveSongs = Song.loveSongs
+
+    }
+    func noResults() {
+        if loveSongs.isEmpty  {
+            noResultLabel.isHidden = false
+            noResultLabel.text = "No Results"
+            print("no results")
+        }
     }
     func filterSongs( for searchText: String) {
         guard !searchText.isEmpty else { return }
@@ -80,11 +90,13 @@ extension ViewController: UISearchBarDelegate {
             return
         }
         filterSongs(for: searchText)
+        noResults()
         searchBar.resignFirstResponder()
     }
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         guard !searchText.isEmpty else {
             updateUI()
+            noResults()
             return
         }
         searchQuery = searchText
